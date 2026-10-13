@@ -42,6 +42,9 @@
     }
     source=source.replace('const selectedCount = selectedAllies.length;', 'const boundFinalAllies=(char.soulSlots||[]).filter(s=>s.unlocked&&s.soulId).map(s=>(history||[]).concat(STARTER_SOULS).find(h=>h.soulId===s.soulId)).filter(Boolean).slice(0,2).map(h=>({...h,currentJob:h.currentJob||h.job,maxHp:h.maxHp||100+(h.level||1)*18,maxMp:h.maxMp||40})); const selectedCount=boundFinalAllies.length;');
     source=source.replace('startBoss(FINAL_BOSS, selectedAllies)','startBoss(FINAL_BOSS, boundFinalAllies)');
+    // Three souls are bound at the tavern; do not truncate the final party to two.
+    source=source.replace('.filter(Boolean).slice(0,2).map(h=>', '.filter(Boolean).slice(0,3).map(h=>');
+    source=source.replace('最大2体の仲間を連れて挑める','最大3体の仲間を連れて挑める');
     const finalMenu=/saves\.map\(\(sv, i\) => sv \? \(\(\) => \{[\s\S]*?\}\)\(\) : null\)/g;
     if((source.match(finalMenu)||[]).length!==1)throw Error("最終決戦の仲間表示が一致しません");
     source=source.replace(finalMenu,'boundFinalAllies.map((a,i)=>React.createElement("div",{key:i,style:{color:"#e8e3d6",fontSize:18,padding:12,borderBottom:"1px solid #555"}}, "🤝 "+a.name+" / "+(JOBS[a.currentJob]||{}).name))');
