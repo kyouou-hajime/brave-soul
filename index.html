@@ -137,7 +137,9 @@ const TRUE_COND = {
   beastking:   { adventure:3, magic:2 },             // 魔獣王：百獣を統べる王
 
   // ─── 盗賊系（T3のみ有効）────────────────────────
-  samurai:     { train:4, adventure:1 }              // 武士：鍛錬と戦
+  samurai:     { train:4, adventure:1 },
+  kengo:       { train:2, adventure:2, rest:1 },
+  shogun:      { train:2, adventure:1, rest:2 }
   // ※ thief(T1)・merchant(T2)・gladiator(T2)はtier===3チェックで発火しないため除外
 };
 
@@ -5274,6 +5276,12 @@ async function loadHistory() {
     return [];
   }
 }
+// 旧セーブはTRUE称号配列を持たないことがある。熟練度100から復元する。
+function restoreTrueMastered(char, jm) {
+  const restored = Object.keys(jm || {}).filter(jobId =>
+    JOBS[jobId] && JOBS[jobId].tier === 3 && jm[jobId] >= 100 && TRUE_MS[jobId]);
+  return {...char, trueMastered: [...new Set([...(char.trueMastered || []), ...restored])]};
+}
 function makeSlimSave(char, jm, day, maxDays, bossState) {
   const slim = {
     name: char.name,
@@ -5333,6 +5341,8 @@ function makeSlimSave(char, jm, day, maxDays, bossState) {
     soulRoomUnlocked: char.soulRoomUnlocked || false,
     allInMissWin: char.allInMissWin || 0,  // 遊戯師TRUE条件カウンター
     allInMissedThisBattle: char.allInMissedThisBattle || false,
+    trueMastered: char.trueMastered || [],
+    trueActionProgress: char.trueActionProgress || {},
     soulPt: char.soulPt || 0,
     soulSlots: char.soulSlots || [
       { unlocked: true,  soulId: null },
@@ -5907,7 +5917,7 @@ function App() {
   // ── Master Skill Check ───────────────────────────────────────────────
   const checkMasterSkill = (jobId, pts, j, c) => {
     const tier = JOBS[jobId].tier;
-    const rank = mRank(pts, tier);
+    let rank = mRank(pts, tier);
     let newC = {
       ...c
     };
@@ -5933,6 +5943,13 @@ function App() {
         pushLog("🌟 " + JOBS[jobId].name + "をマスター！特色技「" + ms.emoji + ms.name + "」を継承！", "level");
       updateRecordJobRank(jobId, 3).then(()=>loadRecords().then(setSoulRecords)).catch(()=>{});
       }
+    }
+    // 遊戯師：5勝と通常熟練度99が揃った時だけ100へ
+    if (jobId === "yuugishi" && tier === 3 && rank === 3 &&
+        (newC.allInMissWin || 0) >= 5 && !(newC.trueMastered || []).includes(jobId)) {
+      j[jobId] = 100;
+      rank = 4;
+      pushLog("🎭 オールイン失敗後の5勝と熟練度99を達成！TRUE MASTER解放！", "level");
     }
     // TRUE MASTER（rank4=100）: trueMasteredに追加（inheritedSkillsには入れない）
     if (rank >= 4 && !(newC.trueMastered || []).includes(jobId)) {
@@ -5994,8 +6011,9 @@ function App() {
   const doLoad = async slot => {
     const data = saves[slot];
     if (!data) return;
-    setChar(data.char);
+    setChar(restoreTrueMastered(data.char, data.jm));
     setJm(data.jm);
+    setSecretProgress(data.char.trueActionProgress || {});
     setDay(data.day || 1);
     setMaxDays(data.maxDays || 100);
     setEnding(null);
@@ -6160,11 +6178,11 @@ function App() {
 
   // TRUE MASTER冒険カウント共通処理
   const _countAdvTRUE = (c, j) => {
-    if (JOBS[c.currentJob] && JOBS[c.currentJob].tier === 3 && (j[c.currentJob] || 0) === 99) {
+    if (JOBS[c.currentJob] && JOBS[c.currentJob].tier === 3 && (jm[c.currentJob] || 0) === 99 && (j[c.currentJob] || 0) === 99) {
       const cond = TRUE_COND[c.currentJob];
       if (cond && cond["adventure"]) {
         const sp = {
-          ...secretProgress
+          ...(c.trueActionProgress || secretProgress)
         };
         const jobSP = {
           ...(sp[c.currentJob] || {})
@@ -6195,6 +6213,7 @@ function App() {
           const total = Object.values(cond).reduce((s, v) => s + v, 0);
           pushLog("⚡ 限界の境地…真の覚醒まであと" + (total - done) + "回");
         }
+        c = {...c, trueActionProgress: sp};
         setSecretProgress(sp);
       }
     }
@@ -7319,13 +7338,13 @@ const doAction = async actionId => {
     }
 
     // ── TRUE MASTER progress (tier3のみ: 99/99到達後に追加カウント) ────────
-    if (JOBS[c.currentJob].tier === 3 && (j[c.currentJob] || 0) === 99) {
+    if (JOBS[c.currentJob].tier === 3 && (jm[c.currentJob] || 0) === 99 && (j[c.currentJob] || 0) === 99) {
       const cond = TRUE_COND[c.currentJob];
       if (cond && cond[actionId]) {
         const sp = {
-          ...secretProgress
+          ...(c.trueActionProgress || secretProgress)
         };
-        const jobSP = sp[c.currentJob] || {};
+        const jobSP = { ...(sp[c.currentJob] || {}) };
         jobSP[actionId] = (jobSP[actionId] || 0) + 1;
         sp[c.currentJob] = jobSP;
         // Check if condition met
@@ -7354,6 +7373,7 @@ const doAction = async actionId => {
           const total = Object.values(cond).reduce((s, v) => s + v, 0);
           pushLog(`⚡ 限界の境地…真の覚醒まであと${total - done}回`);
         }
+        c = {...c, trueActionProgress: sp};
         setSecretProgress(sp);
       }
     }
@@ -7652,9 +7672,9 @@ const doAction = async actionId => {
         if (_eff.missChance && Math.random() < _eff.missChance) {
           bl.push("😰 "+_sk.name+"…外れた！ HP消費だけ発生");
           if (_eff.costHpPct) { c.hp=Math.max(1,c.hp-Math.floor(c.maxHp*_eff.costHpPct)); }
-          c._allInMissed = true; // 遊戯師TRUE条件
+          if (c.currentJob === "yuugishi") c.allInMissedThisBattle = true;
           setBattle({...bt,enemy:en,charHp:c.hp,charMp:c.mp,buffs:bt.buffs||[]});
-          setChar({...c, allInMissedThisBattle:true});
+          setChar(c);
           setBattleLog(bl.slice(-8)); setLoading(false); return;
         }
         let _dmg = Math.max(1, Math.floor(es.atk * _eff.v));
@@ -8396,18 +8416,20 @@ const doAction = async actionId => {
         if (!won && c.hp <= 0) setPhase("gameover");else {
           pushLog(won ? `🏆 ${enemy.emoji}${enemy.name}を倒した！` : "💀 敗北…", won ? "event" : "danger");
           // 遊戯師TRUE条件：オールイン外れ後の勝利カウント
-          if (won && c.allInMissedThisBattle && c.currentJob === "yuugishi") {
-            const _newCount = (c.allInMissWin || 0) + 1;
+          if (won && c.allInMissedThisBattle && c.currentJob === "yuugishi" &&
+              (j.yuugishi || 0) < 100) {
+            const _newCount = Math.min(5, (c.allInMissWin || 0) + 1);
             c = {...c, allInMissWin: _newCount, allInMissedThisBattle: false};
             pushLog("🎭 オールイン失敗から勝利！ [" + _newCount + "/5]", "event");
-            if (_newCount >= 5 && !(c.trueMastered||[]).includes("yuugishi")) {
-              c = {...c, trueMastered: [...(c.trueMastered||[]), "yuugishi"]};
-              pushLog("🎭 TRUE MASTER解放！「遊戯王」", "level");
-              pushLog("勝負とは運ではない。負け札を引いてからが本番だ。", "level");
+            if (_newCount >= 5 && (j.yuugishi || 0) >= 99) {
+              c = checkMasterSkill("yuugishi", j.yuugishi, j, c);
             }
-          } else if (won) {
+          } else {
             c = {...c, allInMissedThisBattle: false};
           }
+          setChar(c);
+          setJm({...j});
+          doAutoSave(c, j, nd, maxDays, null);
           // 剣聖試練：勝利→flag付与、敗北→1日消費
           if (enemy && enemy.isNecromancerTrial) {
             if (won) {
@@ -8560,7 +8582,9 @@ const doAction = async actionId => {
     };
     setChar(c => ({
       ...c,
-      currentJob: jobId
+      currentJob: jobId,
+      allInMissedThisBattle: false,
+      trueActionProgress: {}
     }));
     setJm(newJm);
     setSecretBattles(0);
@@ -9145,10 +9169,11 @@ const doAction = async actionId => {
                 compMet:rc.compMet||{alba:false,lira:false,gord:false},
                 inheritedSkills:rc.inheritedSkills||{}
               });
-              const _rc = {..._rc0, _soulBonus: calcSoulBonus(_rc0, [])};
+              const _rc = restoreTrueMastered({..._rc0, _soulBonus: calcSoulBonus(_rc0, [])}, sv.jm||{});
               setChar(_rc);
               }
-              setJm(sv.jm||{});setDay(sv.day||1);setMaxDays(sv.maxDays||100);setPartyMembers([]);
+              setSecretProgress(rc.trueActionProgress || {});
+               setJm(sv.jm||{});setDay(sv.day||1);setMaxDays(sv.maxDays||100);setPartyMembers([]);
               setLog([{text:"転生記憶が目視める… "+rc.name,type:"event",id:0}]);
               setPhase(sv.bossState?"midBossSelect":"main");},
             style:{padding:"10px 0 10px 14px",cursor:"pointer",
@@ -12841,7 +12866,8 @@ const doAction = async actionId => {
                       const nj={...jm};if(!nj[id]&&tier>=2) nj[id]=1;
                       setJm(nj);
                       // 転職時：装備不可の武器を自動でインベントリに戻す
-                      let _nc = {...char, currentJob: id};
+                      let _nc = {...char, currentJob: id, allInMissedThisBattle: false, trueActionProgress: {}};
+                       setSecretProgress({});
                       if (_nc.weapon && !canEquip(id, _nc.weapon)) {
                         pushLog("⚠️ " + (WEAPONS[_nc.weapon]&&WEAPONS[_nc.weapon].name||_nc.weapon) + "は装備不可のため外れた", "danger");
                         _nc.weapon = null;
