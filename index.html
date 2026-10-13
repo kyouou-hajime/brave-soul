@@ -63,23 +63,23 @@
     if(source.split(scDecl.replace(/\\n/g,"\n")).length!==2)throw Error("イベント修正位置不一致");
     source=source.replace(scDecl.replace(/\\n/g,"\n"),scRepl.replace(/\\n/g,"\n"));
     // Keep the game visible on a runtime error; show a dismissible diagnostic instead of destroying #root.
-    const errorHandler=/window\\.onerror = function\\(msg,src,line,col,err\\)\\{[\\s\\S]*?\\n\\};\\nconst root = ReactDOM\\.createRoot/;
-    if(!errorHandler.test(source))throw Error("error handler not found");
-    const safeHandler = [
+    // Runtime error banner without destructive replacement of #root.
+    const begin=source.indexOf('window.onerror = function(msg,src,line,col,err){');
+    const finish=source.indexOf('const root = ReactDOM.createRoot',begin);
+    if(begin<0 || finish<0)throw Error('error-handler source position mismatch');
+    const replacement=[
       'window.onerror = function(msg,src,line,col,err){',
-      '  console.error("BRAVE SOUL",msg,src,line,col,err);',
-      '  var previous=document.getElementById("bs-error-banner");',
-      '  if(previous)previous.remove();',
-      '  var box=document.createElement("div");box.id="bs-error-banner";',
-      '  box.style.cssText="position:fixed;z-index:999999;bottom:12px;left:12px;right:12px;max-width:720px;margin:auto;padding:12px 14px;background:#251723;color:#fff;border:2px solid #ed6675;border-radius:10px;font:15px/1.5 sans-serif;box-shadow:0 8px 22px #000a";',
-      '  var message=document.createElement("div");message.textContent="⚠️ ゲームの処理でエラーが発生: "+String(msg)+" ("+line+":"+col+")";',
-      '  var btn=document.createElement("button");btn.textContent="閉じる";btn.style.cssText="font:16px sans-serif;min-height:40px;margin-top:8px";btn.onclick=function(){box.remove()};',
-      '  box.appendChild(message);box.appendChild(btn);document.body.appendChild(box);',
-      '  return true;',
+      ' console.error("BRAVE SOUL",msg,src,line,col,err);',
+      ' var old=document.getElementById("bs-error-banner");if(old)old.remove();',
+      ' var box=document.createElement("div");box.id="bs-error-banner";',
+      ' box.style.cssText="position:fixed;z-index:999999;bottom:12px;left:12px;right:12px;max-width:720px;margin:auto;padding:14px;background:#271524;color:#fff;border:2px solid #ed6675;border-radius:10px;font:16px sans-serif";',
+      ' box.textContent="⚠️ ゲームエラー: "+String(msg)+" "+line+":"+col;',
+      ' var close=document.createElement("button");close.textContent="閉じる";close.onclick=function(){box.remove()};box.appendChild(close);',
+      ' document.body.appendChild(box);return true;',
       '};',
-      'const root = ReactDOM.createRoot'
-    ].join("\\n").replace(/\\n/g,"\n");
-    source=source.replace(errorHandler,safeHandler);
+      ''
+    ].join("\n");
+    source=source.slice(0,begin)+replacement+source.slice(finish);
     document.open();
     document.write(source);
     document.close();
