@@ -17,6 +17,8 @@
       ['rest: "瞑想",','rest: "睡眠",',1],
       ['"⚡ 限界の境地…真の覚醒まであと" + (total - done) + "回"','"⚡ TRUE進捗 " + Object.entries(cond).map(([key,need])=>(key==="train"?"特訓":key==="rest"?"睡眠":key==="adventure"?"冒険":key==="magic"?"魔法":key==="eat"?"食事":key)+" "+Math.min(jobSP[key]||0,need)+"/"+need).join("・")',1],
       ['`⚡ 限界の境地…真の覚醒まであと${total - done}回`','`⚡ TRUE進捗 ${Object.entries(cond).map(([key,need])=>(key==="train"?"特訓":key==="rest"?"睡眠":key==="adventure"?"冒険":key==="magic"?"魔法":key==="eat"?"食事":key)+" "+Math.min(jobSP[key]||0,need)+"/"+need).join("・")}`',1],
+      ['const text = await callAI(','const text = await (async () => null)(',1],
+      ['if (finishGame._called) return; finishGame._called = true;','if (finishGame._called && (phase === "midBossPrep" || phase === "finalBossPrep")) return; finishGame._called = true;',1],
       ['setSecretProgress({});','setSecretProgress(char.trueActionProgress || {});',2]
     ];
     for(const [before,after,expected] of fixes){
