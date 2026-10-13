@@ -14,6 +14,9 @@
       [stale,'(j[c.currentJob] || 0) === 99',2],
       ['currentJob: jobId,\n      allInMissedThisBattle: false,\n      trueActionProgress: {}','currentJob: jobId,\n      allInMissedThisBattle: false,\n      trueActionProgress: c.trueActionProgress || {}',1],
       ['let _nc = {...char, currentJob: id, allInMissedThisBattle: false, trueActionProgress: {}}','let _nc = {...char, currentJob: id, allInMissedThisBattle: false, trueActionProgress: char.trueActionProgress || {}}',1],
+      ['rest: "瞑想",','rest: "睡眠",',1],
+      ['"⚡ 限界の境地…真の覚醒まであと" + (total - done) + "回"','"⚡ TRUE進捗 " + Object.entries(cond).map(([key,need])=>(key==="train"?"特訓":key==="rest"?"睡眠":key==="adventure"?"冒険":key==="magic"?"魔法":key==="eat"?"食事":key)+" "+Math.min(jobSP[key]||0,need)+"/"+need).join("・")',1],
+      ['`⚡ 限界の境地…真の覚醒まであと${total - done}回`','`⚡ TRUE進捗 ${Object.entries(cond).map(([key,need])=>(key==="train"?"特訓":key==="rest"?"睡眠":key==="adventure"?"冒険":key==="magic"?"魔法":key==="eat"?"食事":key)+" "+Math.min(jobSP[key]||0,need)+"/"+need).join("・")}`',1],
       ['setSecretProgress({});','setSecretProgress(char.trueActionProgress || {});',2]
     ];
     for(const [before,after,expected] of fixes){
