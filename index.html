@@ -27,7 +27,7 @@
     for(const [before,after,expected] of fixes){
       const count=source.split(before).length-1;
       if(count!==expected)throw new Error('修正対象が一致しません（'+count+'/'+expected+'）。安全のため起動を停止しました。');
-      source=source.split(before).join(after);
+      source=source.split(before).join(after.replace(/\\n/g, '\n'));
     }
     // P1 Dark Ritual visual skin; game state and logic remain unchanged.
     if(!source.includes('</head>'))throw new Error('HTML head not found');
