@@ -57,6 +57,11 @@
     const modTag="<script src=\"./dungeon/ogre-squad-v0.1.js?v=3\"></scr"+"ipt><script src=\"./dungeon/boss-squad-addon.js?v=3\"></scr"+"ipt>";
     if(source.split(injectPoint).length!==2)throw new Error("Script patch mismatch");
     source=source.replace(injectPoint,modTag+injectPoint);
+    // Adventure choice scope fix: afterChoice handlers need the updated character.
+    const scDecl='      if(ev.isAdvEvent && choice.effect) {\\n        try {\\n          let _sc2 = choice.effect({...char});';
+    const scRepl='      if(ev.isAdvEvent && choice.effect) {\\n        let _sc2 = {...char};\\n        try {\\n          _sc2 = choice.effect({...char});';
+    if(source.split(scDecl.replace(/\\n/g,"\n")).length!==2)throw Error("イベント修正位置不一致");
+    source=source.replace(scDecl.replace(/\\n/g,"\n"),scRepl.replace(/\\n/g,"\n"));
     document.open();
     document.write(source);
     document.close();
