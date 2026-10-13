@@ -1,0 +1,20 @@
+/* BRAVE SOUL Dark Ritual UI phase 1: appearance only */
+:root{color-scheme:dark;--bs-bg:#080d19;--bs-text:#e8e3d6;--bs-gold:#c6ad79}
+html{min-height:100%;background:var(--bs-bg)}
+body,#root,#game-wrapper{background:radial-gradient(ellipse 90% 55% at 50% -12%,#273651 0%,#11182b 42%,#080d19 100%) fixed!important;color:var(--bs-text)!important}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif!important;letter-spacing:.015em}
+#game-wrapper{position:relative;isolation:isolate}
+#game-wrapper:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.22;background-image:linear-gradient(115deg,transparent 0%,rgba(174,144,93,.055) 50%,transparent 100%)}
+#root{position:relative;z-index:1}
+#root button{border-radius:9px!important;min-height:40px;letter-spacing:.035em;text-shadow:0 1px 3px #0009;box-shadow:inset 0 1px #ffffff13,0 3px 12px #0005;transition:transform .14s ease,box-shadow .18s ease,filter .18s ease}
+#root button:not(:disabled):active{transform:scale(.975);filter:brightness(1.25);box-shadow:inset 0 2px 10px #0006,0 0 16px #78bdeb35}
+#root button:focus-visible{outline:2px solid #9acfe5!important;outline-offset:3px}
+#root button:disabled{opacity:.56;cursor:not-allowed}
+#root input,#root select,#root textarea{color:var(--bs-text);border-radius:7px!important;accent-color:#9abdd1}
+#root [style*="border: 2px solid"],#root [style*="border:2px solid"]{border-radius:10px!important}
+::selection{background:#745990;color:#fff}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-thumb{background:#5a6275;border-radius:6px}
+@media(hover:hover){#root button:not(:disabled):hover{filter:brightness(1.14);box-shadow:inset 0 1px #ffffff23,0 6px 18px #0008,0 0 14px #91c3ed16}}
+@media(max-width:600px){#root{padding-inline:10px!important}#root button{min-height:43px}}
+@media(prefers-reduced-motion:reduce){#root button{transition:none!important}*,*:before,*:after{animation-duration:.01ms!important;scroll-behavior:auto!important}}
