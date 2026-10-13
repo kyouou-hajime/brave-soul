@@ -18,3 +18,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Y
 @media(hover:hover){#root button:not(:disabled):hover{filter:brightness(1.14);box-shadow:inset 0 1px #ffffff23,0 6px 18px #0008,0 0 14px #91c3ed16}}
 @media(max-width:600px){#root{padding-inline:10px!important}#root button{min-height:43px}}
 @media(prefers-reduced-motion:reduce){#root button{transition:none!important}*,*:before,*:after{animation-duration:.01ms!important;scroll-behavior:auto!important}}
+
+/* v1.1: tablet legibility throughout, including adventure choices */
+#root{font-size:18px!important;line-height:1.6!important}
+#root div,#root span,#root p,#root section,#root article,#root label{line-height:1.52}
+#root button{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif!important;font-size:clamp(16px,2.1vw,19px)!important;line-height:1.45!important;min-height:52px!important;padding:11px 13px!important;white-space:normal!important;overflow-wrap:anywhere}
+#root [style*="font-size: 8px"],#root [style*="font-size:8px"],
+#root [style*="font-size: 9px"],#root [style*="font-size:9px"],
+#root [style*="font-size: 10px"],#root [style*="font-size:10px"],
+#root [style*="font-size: 11px"],#root [style*="font-size:11px"],
+#root [style*="font-size: 12px"],#root [style*="font-size:12px"],
+#root [style*="font-size: 13px"],#root [style*="font-size:13px"]{font-size:16px!important}
+#root [style*="font-size: 14px"],#root [style*="font-size:14px"],
+#root [style*="font-size: 15px"],#root [style*="font-size:15px"]{font-size:17px!important}
+#root [style*="color: rgb(85, 85, 119)"],#root [style*="color: #555577"]{color:#a5adc2!important}
+@media(max-width:600px){#root{font-size:17px!important}#root button{font-size:16px!important;min-height:50px!important}}
