@@ -41,7 +41,7 @@ function render(state,React,onOrder,onNext){
   h("div",{style:{marginTop:12}},button(state.result?"戦闘終了":"▶ 部隊全員の行動を実行",onNext,true)),
   h("div",{style:{background:"#111a2b",border:"1px solid #45506b",borderRadius:8,
   padding:12,marginTop:16,minHeight:95,fontSize:16,lineHeight:1.7}},
-   ...(state.log.length?state.log.slice(-7):["作戦を選び、部隊に指示を出そう。"]).map((msg,i)=>h("div",{key:i},msg))))));
+   ...(state.log.length?state.log.slice(-7):["作戦を選び、部隊に指示を出そう。"]).map((msg,i)=>h("div",{key:i},msg)))));
 }
 root.BraveBossAddon={start,render};
 })(typeof window!=="undefined"?window:globalThis);
