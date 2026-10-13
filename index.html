@@ -33,6 +33,13 @@
     // P1 Dark Ritual visual skin; game state and logic remain unchanged.
     if(!source.includes('</head>'))throw new Error('HTML head not found');
     source=source.replace('</head>','<link rel="stylesheet" href="./ui/dark-ritual-v1.css?v=1"></head>');
+    // Day 10 tavern transition and standalone tavern scene (visual/UI only).
+    const day10Patches=[["        setTimeout(()=>setPhase(\"main\"), 0);\n        return;\n      }\n      // 通常ストーリーイベント","        setTimeout(()=>setPhase(ev.id===\"tavern_master_day10\"?\"tavern\":\"main\"), 0);\n        return;\n      }\n      // 通常ストーリーイベント"],["  // ── 酒場 ──────────────────────────────────────────────────────────────\n  // tavern → 魂の間へ直接リダイレクト\n  if (phase === \"tavern\") {\n    setTimeout(()=>setPhase(\"soulRoom\"),0);\n    return null;\n  }\n\n","  // ── 酒場 ──────────────────────────────────────────────────────────────\n  // Day 10: make the tavern a real scene rather than instantly redirecting.\n  if (phase === \"tavern\") {\n    return React.createElement(\"div\",{style:ROOT},\n      React.createElement(\"div\",{style:{width:\"100%\",maxWidth:560,display:\"flex\",flexDirection:\"column\",gap:14}},\n        React.createElement(\"div\",{style:{...PANEL,background:\"linear-gradient(145deg,#241b22,#111425)\",borderColor:\"#a58a60\",textAlign:\"center\",padding:\"30px 20px\"}},\n          React.createElement(\"div\",{style:{fontSize:40,marginBottom:10}},\"🍺\"),\n          React.createElement(\"div\",{style:{fontSize:26,color:\"#edd7a2\",fontWeight:700,marginBottom:14}},\"旅人の酒場\"),\n          React.createElement(\"div\",{style:{fontSize:18,color:\"#e3ddcb\",lineHeight:1.8}},\"酒場の主人が、地下へ続く扉を静かに開いた。\"),\n          React.createElement(\"div\",{style:{fontSize:16,color:\"#c1b9aa\",lineHeight:1.8,marginTop:8}},\"「ここから先は魂の間だ。かつての旅人たちの記憶が眠っている」\")\n        ),\n        React.createElement(\"button\",{style:{...BTN(\"#c6ad79\"),width:\"100%\",fontSize:19,minHeight:58},onClick:()=>setPhase(\"soulRoom\")},\"👻 地下の魂の間へ進む\"),\n        React.createElement(\"button\",{style:{...BTN(\"#7a9aaf\"),width:\"100%\",fontSize:17,minHeight:50},onClick:()=>setPhase(\"main\")},\"← 酒場を出る\")\n      )\n    );\n  }\n\n"]];
+    for(const [from,to] of day10Patches){
+      const count=source.split(from).length-1;
+      if(count!==1)throw new Error("Day10酒場の更新位置不一致: "+count);
+      source=source.replace(from,to);
+    }
     document.open();
     document.write(source);
     document.close();
