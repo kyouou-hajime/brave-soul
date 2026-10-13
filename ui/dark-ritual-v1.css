@@ -33,3 +33,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Y
 #root [style*="font-size: 15px"],#root [style*="font-size:15px"]{font-size:17px!important}
 #root [style*="color: rgb(85, 85, 119)"],#root [style*="color: #555577"]{color:#a5adc2!important}
 @media(max-width:600px){#root{font-size:17px!important}#root button{font-size:16px!important;min-height:50px!important}}
+
+/* v1.2: adventure and event choice contrast */
+#root button:not(:disabled){color:#ece7df!important}
+#root button:not(:disabled) span,#root button:not(:disabled) div{color:inherit!important}
+#root button:disabled{color:#a9a9bd!important;opacity:.62}
+#root button{font-weight:600!important}
