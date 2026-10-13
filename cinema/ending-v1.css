@@ -1,0 +1,17 @@
+/* BRAVE SOUL cinematic endings v1 */
+.bs-film{position:relative;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;color:#eee8dd;background:radial-gradient(ellipse at 48% 37%,#243c58 0%,#0d1628 52%,#03060d 100%);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif!important;overflow:hidden}
+.bs-film.defeated{background:radial-gradient(ellipse at 48% 37%,#4a2433 0%,#20111f 52%,#08070c 100%)}
+.bs-film:before{content:"";position:absolute;inset:-35%;pointer-events:none;background:conic-gradient(from 110deg,transparent,#b2c7ff12,transparent,#ffda9410,transparent);animation:bs-turn 35s linear infinite}
+.bs-film-top,.bs-film-bottom{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;gap:14px;padding:18px clamp(14px,5vw,40px);font-size:15px;letter-spacing:.08em;color:#d0ba92}
+.bs-film button{border:1px solid #ad9970!important;background:#1b2638!important;color:#f3e9d9!important;min-height:48px;padding:10px 17px;border-radius:8px;font-size:16px!important;font-weight:600;cursor:pointer}
+.bs-film-stage{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:390px;padding:35px 18px;cursor:pointer;outline:none;animation:bs-scene 1.2s ease both}
+.bs-film-stage:focus-visible{outline:2px solid #e6c486;outline-offset:-4px}
+.bs-film-emblem{font-size:clamp(70px,14vw,125px);filter:drop-shadow(0 0 30px #8abce666);margin-bottom:28px;animation:bs-glow 3.5s ease-in-out infinite alternate}
+.bs-film-chapter{font-size:clamp(27px,5vw,40px);font-weight:700;color:#f3dbaa;letter-spacing:.1em}
+.bs-film-rule{margin:25px 0;width:110px;height:1px;background:linear-gradient(90deg,transparent,#c9af7d,transparent)}
+.bs-film-dialogue{font-size:clamp(18px,3vw,24px);font-weight:500;white-space:pre-line;line-height:2.05;max-width:680px;text-shadow:0 2px 7px #000a}
+.bs-film-hero{margin-top:34px;color:#b8cde1;font-size:18px;letter-spacing:.12em}
+@keyframes bs-scene{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+@keyframes bs-glow{from{filter:drop-shadow(0 0 12px #9db5ff55)}to{filter:drop-shadow(0 0 38px #ffdd9f80)}}
+@keyframes bs-turn{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.bs-film *,.bs-film:before{animation:none!important}}
