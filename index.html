@@ -19,6 +19,9 @@
       ['`⚡ 限界の境地…真の覚醒まであと${total - done}回`','`⚡ TRUE進捗 ${Object.entries(cond).map(([key,need])=>(key==="train"?"特訓":key==="rest"?"睡眠":key==="adventure"?"冒険":key==="magic"?"魔法":key==="eat"?"食事":key)+" "+Math.min(jobSP[key]||0,need)+"/"+need).join("・")}`',1],
       ['const text = await callAI(','const text = await (async () => null)(',1],
       ['if (finishGame._called) return; finishGame._called = true;','if (finishGame._called && (phase === "midBossPrep" || phase === "finalBossPrep")) return; finishGame._called = true;',1],
+      ['    setPhase("main");\n  };\n\n  // ── CREATION','    setPhase((data.day || 1) >= (data.maxDays || 100) ? ((data.maxDays || 100) <= 100 ? "midBossPrep" : "finalBossPrep") : "main");\n  };\n\n  // ── CREATION',1],
+      ['setPhase(sv.bossState?"midBossSelect":"main");','setPhase(sv.bossState?"midBossSelect":((sv.day||1)>=(sv.maxDays||100)?((sv.maxDays||100)<=100?"midBossPrep":"finalBossPrep"):"main"));',1],
+      ['  // ── MAIN SCREEN (default) ─────────────────────────────────────────────','  // Day-limit safety: a visible boss entry even when an old save resumes on the main screen.\\n  if (char && phase === "main" && day >= maxDays) {\\n    return React.createElement("div",{style:{...ROOT,justifyContent:"center",gap:18}},\\n      React.createElement("div",{style:{...PANEL,textAlign:"center",fontSize:22,color:"#e8d6a2"}},"⚔️ DAY "+day+" / "+maxDays+"　試練の時"),\\n      React.createElement("button",{style:{...BTN("#e8b66c"),minHeight:64,fontSize:22,width:"100%",maxWidth:560},onClick:()=>setPhase(maxDays<=100?"midBossPrep":"finalBossPrep")},"⚔️ ボス戦へ進む"),\\n      React.createElement("div",{style:{fontSize:17,color:"#b7bbc9"}},"セーブデータはそのまま。準備画面で職業を変更できます。"));\\n  }\\n  // ── MAIN SCREEN (default) ─────────────────────────────────────────────',1],
       ['setSecretProgress({});','setSecretProgress(char.trueActionProgress || {});',2]
     ];
     for(const [before,after,expected] of fixes){
