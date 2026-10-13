@@ -39,3 +39,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Y
 #root button:not(:disabled) span,#root button:not(:disabled) div{color:inherit!important}
 #root button:disabled{color:#a9a9bd!important;opacity:.62}
 #root button{font-weight:600!important}
+
+/* v1.3: management controls remain readable, regardless of muted game styles */
+#root button{color:#f0e9dc!important;opacity:1!important}
+#root button span,#root button div{color:inherit!important}
+#root button:disabled{color:#b9b3c3!important;opacity:.7!important}
+#root button[style*="cursor: not-allowed"]{color:#b9b3c3!important}
