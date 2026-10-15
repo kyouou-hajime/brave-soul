@@ -99,6 +99,9 @@
     const jobSkillAnchor="<script>\nfunction _slicedToArray";
     if(source.split(jobSkillAnchor).length!==2)throw Error("職業スキルファイルの読み込み位置が不明です");
     source=source.replace(jobSkillAnchor,'<script src="./combat/job-skills-v1.js?v=1"></scr'+'ipt>'+jobSkillAnchor);
+    const saveHookMarker="  // ── useMemo: 重い計算をメモ化";
+    if(source.split(saveHookMarker).length!==2)throw Error("購入後の自動セーブ挿入位置が不明");
+    source=source.replace(saveHookMarker,"  // Keep purchases, equipment, and skills persistent even during boss preparation.\n  React.useEffect(()=>{\n    if (!char || !jm || ![\"shop\",\"skills\",\"equipment\",\"skillEquip\"].includes(phase)) return;\n    const id=setTimeout(()=>doAutoSave(char,jm,day,maxDays,null),160);\n    return ()=>clearTimeout(id);\n  },[phase,char,jm,day,maxDays]);\n\n"+saveHookMarker);
     document.open();
     document.write(source);
     document.close();
