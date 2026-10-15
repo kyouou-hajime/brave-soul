@@ -14,6 +14,11 @@ const SCENES={
   {world:"dawn",title:"夜明け",line:"閉ざされた空が開き、世界は再び色を取り戻した。"},
   {world:"ember",title:"BRAVE SOUL",line:"魂は、死を超えて強くなる。\nそして物語は、次の時代へ。"}
  ],
+ midBossVictory:[
+  {world:"throne",title:"影の将軍、敗れる",line:"鋼の足音が止まり、戦場に沈黙が訪れる。"},
+  {world:"shatter",title:"開かれる運命",line:"閉ざされていた道に、ひとすじの光が射した。"},
+  {world:"dawn",title:"新たな試練へ",line:"百日の旅は、ここで終わらない。\nその先に待つ、真の魔王の気配を感じた。"}
+ ],
  gameover:[
   {world:"battle",title:"最期の一撃",line:"その手から、剣が滑り落ちた。"},
   {world:"ruins",title:"消えゆく世界",line:"街に灯る光が、一つ、また一つと消えていく。"},
