@@ -84,10 +84,10 @@
     const filmPatches=[["function App() {","function App() {\\n  const [bsFilmSeen,setBsFilmSeen] = React.useState({});"],["  // ── INTRO ────────────────────────────────────────────────────────────","  // Ending film runs once before existing result pages.\n  if (window.BraveEndingFilm && [\"gameover\",\"ending\",\"trueEnding\",\"trueEndingLose\"].includes(phase) && !bsFilmSeen[phase]) {\n    return React.createElement(window.BraveEndingFilm.Cinema,{\n      kind:phase,name:char&&char.name,onDone:()=>setBsFilmSeen(previous=>({...previous,[phase]:true}))\n    });\n  }\n  // ── INTRO ────────────────────────────────────────────────────────────"],["  const reset = () => {","  const reset = () => {\\n    setBsFilmSeen({});"],["      finishGame._called=false;setDay(1);","      setBsFilmSeen({});finishGame._called=false;setDay(1);"]];
     for(const [from,to] of filmPatches){if(source.split(from).length!==2)throw Error("Ending film patch failed");source=source.replace(from,to.replace(/\\n/g,"\n"));}
     if(!source.includes("</head>"))throw Error("Film stylesheet target missing");
-    source=source.replace("</head>",'<link rel="stylesheet" href="./cinema/ending-v1.css?v=1"></head>');
+    source=source.replace("</head>",'<link rel="stylesheet" href="./cinema/ending-v1.css?v=2"></head>');
     const inlineAnchor="<script>\nfunction _slicedToArray";
     if(source.split(inlineAnchor).length!==2)throw Error("Ending script target missing");
-    source=source.replace(inlineAnchor,'<script src="./cinema/ending-v1.js?v=1"></scr'+'ipt>'+inlineAnchor);
+    source=source.replace(inlineAnchor,'<script src="./cinema/ending-v1.js?v=2"></scr'+'ipt>'+inlineAnchor);
     document.open();
     document.write(source);
     document.close();
