@@ -2,6 +2,12 @@
 (function(global){
 "use strict";
 const SCENES={
+ midBossVictory:[
+  {world:"battle",title:"影の将軍、倒れる",line:"最後の一撃とともに、戦場に沈黙が戻った。"},
+  {world:"souls",title:"生き残った魂",line:"共に立ち向かった魂が、淡い光を放つ。\nまだ終わりではない。"},
+  {world:"dawn",title:"旅はさらに続く",line:"新しい道が開かれる。\nそして、遥か先には真の魔王が待っている。"}
+ ],
+
  ending:[
   {world:"battle",title:"長い旅の終わり",line:"幾度の夜を越え、旅人はここに立つ。"},
   {world:"dawn",title:"世界が目覚める",line:"暗い空に、ひとすじの朝日が差し込んだ。"},
