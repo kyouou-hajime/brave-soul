@@ -1,51 +1,75 @@
-/* BRAVE SOUL — ending cinematics v1, independent of saved data. */
+/* BRAVE SOUL cinematic endings v2 — CSS-animated stage, no video downloads. */
 (function(global){
 "use strict";
-const scenes={
+const SCENES={
  ending:[
-  ["⚔️","終わりの地","長い旅路の果てに、ひとつの物語が幕を閉じる。"],
-  ["🌅","新しい朝","夜明けは静かに訪れた。\n歩んだ百日のすべてが、この世界に刻まれた。"],
-  ["🕯️","魂の間","旅が終わっても、魂の記憶は消えない。\n次の旅人が、その光を受け継ぐ。"]
+  {world:"battle",title:"長い旅の終わり",line:"幾度の夜を越え、旅人はここに立つ。"},
+  {world:"dawn",title:"世界が目覚める",line:"暗い空に、ひとすじの朝日が差し込んだ。"},
+  {world:"souls",title:"魂は受け継がれる",line:"その記憶は、次の旅人を照らす灯になる。"}
  ],
  trueEnding:[
-  ["👑","崩れる玉座","最後の一撃が、世界を覆う闇を断ち切った。"],
-  ["✨","共に戦った魂","共に歩んだ仲間たちが、青白い光に包まれる。\nそれぞれの魂が、勝利の証となった。"],
-  ["🌄","夜明けの街","長い夜が終わり、世界に朝が訪れる。"],
-  ["🕯️","受け継ぐ未来","魂は、死を超えて強くなる。\n勇者の物語は、次の旅人へ続いていく。"]
+  {world:"throne",title:"魔王の玉座",line:"最後の一撃が、永遠にも思えた闇を裂いた。"},
+  {world:"shatter",title:"王冠が砕ける",line:"砕けた王冠は、星のような光となって消えていく。"},
+  {world:"souls",title:"共に歩んだ魂",line:"倒れずにここまで来られたのは、一人ではなかったから。"},
+  {world:"dawn",title:"夜明け",line:"閉ざされた空が開き、世界は再び色を取り戻した。"},
+  {world:"ember",title:"BRAVE SOUL",line:"魂は、死を超えて強くなる。\nそして物語は、次の時代へ。"}
  ],
  gameover:[
-  ["💀","倒れた旅人","戦場に、剣が落ちた。\n勝利へと伸ばした手は届かなかった。"],
-  ["🌑","消えゆく灯火","守れなかったものが、闇の向こうへ遠ざかる。"],
-  ["🕯️","それでも魂は残る","ひとつの魂が、静かに灯る。\n終わったのは、この命の旅だけだ。"]
+  {world:"battle",title:"最期の一撃",line:"その手から、剣が滑り落ちた。"},
+  {world:"ruins",title:"消えゆく世界",line:"街に灯る光が、一つ、また一つと消えていく。"},
+  {world:"ember",title:"残された魂",line:"だが、闇の底に小さな灯が残っていた。\n次の旅人を待ちながら。"}
  ],
  trueEndingLose:[
-  ["👑","黒い玉座","王の前で、勇者は膝をついた。\n夜明けはまだ、訪れない。"],
-  ["🌘","闇に沈む街","世界を覆う影は、さらに深さを増していく。"],
-  ["🕯️","次の旅人へ","けれど魂の記憶は、敗北に消されない。\nいつか再び、扉は開かれる。"]
+  {world:"throne",title:"魔王の前で",line:"勇者は、黒い玉座の前に膝をついた。"},
+  {world:"ruins",title:"届かなかった夜明け",line:"世界はまた、深い夜の中へ沈む。"},
+  {world:"ember",title:"それでも",line:"受け継がれる魂がある限り、物語は終わらない。"}
  ]
 };
 function Cinema(props){
- const R=global.React,h=R.createElement;
- const [idx,setIdx]=R.useState(0);
- const all=scenes[props.kind]||scenes.gameover;
- const s=all[idx],end=idx===all.length-1;
- const advance=()=>end?props.onDone():setIdx(i=>i+1);
- R.useEffect(()=>{const t=setTimeout(advance,6500);return()=>clearTimeout(t);},[idx]);
- const endClass=props.kind==="gameover"||props.kind==="trueEndingLose"?" defeated":" victorious";
- return h("div",{className:"bs-film"+endClass},
-  h("div",{className:"bs-film-top"},
-   h("strong",null,"BRAVE SOUL"),
-   h("button",{type:"button",onClick:props.onDone},"スキップ ≫")),
-  h("div",{className:"bs-film-stage",key:idx,onClick:advance,role:"button",tabIndex:0,
-   onKeyDown:e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();advance();}}},
-   h("div",{className:"bs-film-emblem"},s[0]),
-   h("div",{className:"bs-film-chapter"},s[1]),
-   h("div",{className:"bs-film-rule"}),
-   h("p",{className:"bs-film-dialogue"},s[2]),
-   end?h("div",{className:"bs-film-hero"},"―― "+(props.name||"旅人")+"の物語 ――"):null),
-  h("div",{className:"bs-film-bottom"},
-   h("span",null,"SCENE "+(idx+1)+" / "+all.length),
-   h("button",{type:"button",onClick:advance},end?"結果画面へ":"次へ ›")));
+ const R=global.React, h=R.createElement;
+ const [index,setIndex]=R.useState(0);
+ const scenes=SCENES[props.kind]||SCENES.gameover;
+ const scene=scenes[index];
+ const last=index===scenes.length-1;
+ const advance=()=>{if(last)props.onDone();else setIndex(n=>n+1);};
+ R.useEffect(()=>{
+   const id=setTimeout(()=>{if(index>=scenes.length-1)props.onDone();else setIndex(n=>n+1);},7800);
+   return()=>clearTimeout(id);
+ },[index,props.kind]);
+ const defeated=props.kind==="gameover"||props.kind==="trueEndingLose";
+ return h("div",{className:"bs-cinema "+(defeated?"bs-lost":"bs-won")},
+   h("div",{className:"bs-cinema-vignette"}),
+   h("div",{className:"bs-cinema-scene bs-world-"+scene.world,key:index},
+     h("div",{className:"bs-cinema-sky"}),
+     h("div",{className:"bs-cinema-light"}),
+     h("div",{className:"bs-cinema-moon"}),
+     h("div",{className:"bs-cinema-spires"}),
+     h("div",{className:"bs-cinema-mountain back"}),
+     h("div",{className:"bs-cinema-mountain front"}),
+     h("div",{className:"bs-cinema-throne"}),
+     h("div",{className:"bs-cinema-warrior"}),
+     h("div",{className:"bs-cinema-blade"}),
+     h("div",{className:"bs-cinema-altar"}),
+     h("div",{className:"bs-cinema-soul-orb"}),
+     ...Array.from({length:24},(_,i)=>h("i",{key:i,className:"bs-cinema-particle",style:{"--i":i,"--x":((i*73)%93+4)+"%","--delay":((i*17)%39)/10+"s"}})),
+     h("div",{className:"bs-cinema-flash"}),
+     h("div",{className:"bs-cinema-letterbox top"}),
+     h("div",{className:"bs-cinema-letterbox bottom"}),
+     h("div",{className:"bs-cinema-caption"},
+       h("div",{className:"bs-cinema-kicker"},defeated?"FALLEN SOUL":"THE SOUL ENDURES"),
+       h("h2",null,scene.title),
+       h("div",{className:"bs-cinema-rule"}),
+       h("p",null,scene.line),
+       last?h("div",{className:"bs-cinema-name"},"— "+(props.name||"旅人")+" —"):null)
+   ),
+   h("div",{className:"bs-cinema-controls"},
+     h("span",null,"BRAVE SOUL　 •　 "+(index+1)+" / "+scenes.length),
+     h("div",null,
+       h("button",{type:"button",onClick:advance},last?"結果を見る":"次の場面へ ›"),
+       h("button",{type:"button",className:"bs-cinema-skip",onClick:props.onDone},"スキップ ≫")
+     )
+   )
+ );
 }
 global.BraveEndingFilm={Cinema};
 })(window);
