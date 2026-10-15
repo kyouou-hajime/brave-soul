@@ -14,7 +14,7 @@
 .bs-cinema-soul-orb{position:absolute;bottom:24%;left:50%;width:85px;height:85px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle,#f7f5e0,#8bccf5 25%,#3877b5aa 54%,transparent 73%);filter:drop-shadow(0 0 40px #88bbec);animation:bs-orb 3s ease-in-out infinite alternate}
 .bs-cinema-particle{position:absolute;left:var(--x);bottom:-10%;height:5px;width:5px;border-radius:50%;background:#b6dbff;box-shadow:0 0 15px #a8dbff;animation:bs-float 6s linear infinite;animation-delay:var(--delay);opacity:0}
 .bs-cinema-flash{position:absolute;inset:0;pointer-events:none;background:#fff;opacity:0}
-.bs-cinema-caption{position:absolute;left:5%;right:5%;top:57%;text-align:center;text-shadow:0 3px 15px #000,0 1px 5px #000;animation:bs-caption 1.8s ease .6s both}
+.bs-cinema-caption{position:absolute;left:5%;right:5%;bottom:calc(6vh + 88px);text-align:center;text-shadow:0 3px 15px #000,0 1px 5px #000;animation:bs-caption 1.8s ease .6s both}
 .bs-cinema-kicker{font-size:12px;letter-spacing:.32em;color:#d3b88b;font-weight:700}
 .bs-cinema-caption h2{font-size:clamp(26px,5.8vw,48px);font-weight:700;margin:12px 0 4px}
 .bs-cinema-rule{height:1px;width:100px;background:linear-gradient(90deg,transparent,#c9b98b,transparent);margin:14px auto}
@@ -51,5 +51,5 @@
 @keyframes bs-burst{0%{opacity:.82}20%{opacity:.28}100%{opacity:0}}
 @keyframes bs-rise{from{top:60%;opacity:.25}to{top:35%;opacity:1}}
 @keyframes bs-orb{to{transform:translateX(-50%) translateY(-18px);filter:drop-shadow(0 0 65px #c3e8ff)}}
-@media(max-width:520px){.bs-cinema-caption{top:55%}.bs-cinema-controls{font-size:11px}.bs-cinema-controls button{font-size:13px;padding:8px}}
+@media(max-width:520px){.bs-cinema-controls{font-size:11px}.bs-cinema-controls button{font-size:13px;padding:8px}}
 @media(prefers-reduced-motion:reduce){.bs-cinema *{animation:none!important}}
