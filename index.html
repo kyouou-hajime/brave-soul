@@ -51,10 +51,10 @@
     const finalMenu=/saves\.map\(\(sv, i\) => sv \? \(\(\) => \{[\s\S]*?\}\)\(\) : null\)/g;
     if((source.match(finalMenu)||[]).length!==1)throw Error("最終決戦の仲間表示が一致しません");
     source=source.replace(finalMenu,'boundFinalAllies.map((a,i)=>React.createElement("div",{key:i,style:{color:"#e8e3d6",fontSize:18,padding:12,borderBottom:"1px solid #555"}}, "🤝 "+a.name+" / "+(JOBS[a.currentJob]||{}).name))');
-    const bossPatches=[["  const startBoss = (bossData, allies) => {","  const startBoss = (bossData, allies) => {\n    if(window.BraveBossAddon && window.BraveDungeonSquad){setBossBattle({bossData,squad:window.BraveBossAddon.start(bossData,allies,char)});setBossLog([\"⚔️ 部隊戦へ突入！\"]);setLoading(false);setPhase(\"squadBoss\");return;}"],["  if (phase === \"bossBattle\" && bossBattle) {","  if(phase===\"squadBoss\" && bossBattle && bossBattle.squad){\n    const sq=bossBattle.squad;\n    const changeOrder=o=>setBossBattle({...bossBattle,squad:window.BraveDungeonSquad.setOrder(sq,o)});\n    const nextRound=()=>{\n      if(sq.result)return;\n      const n=window.BraveDungeonSquad.advance(sq);\n      setBossBattle({...bossBattle,squad:n});setBossLog(n.log);\n      if(n.result===\"victory\"){\n        if(bossBattle.bossData.name===MID_BOSS.name){setMaxDays(150);setDay(101);setPhase(\"midBossVictory\");}\n        else{const c={...char,atk:char.atk+5,def:char.def+5,mag:char.mag+5,spd:char.spd+5,luc:char.luc+5};setChar(c);setPhase(\"trueEnding\");\n        saveHistory({soulId:genSoulId(),name:c.name,job:c.currentJob,level:c.level,atk:c.atk,def:c.def,mag:c.mag,spd:c.spd,luc:c.luc,ali:c.ali,cf:c.cf,ending:\"TRUE ENDING\",date:new Date().toLocaleDateString(\"ja-JP\"),trueMastered:c.trueMastered||[],inheritedSkills:c.inheritedSkills||{}}).then(()=>loadHistory().then(setHistory)).catch(()=>{});\n        clearCurrent().catch(()=>{});setCurrentSave(null);}\n      }else if(n.result===\"defeat\"){clearCurrent().catch(()=>{});setCurrentSave(null);setChar({...char,hp:0});setPhase(\"gameover\");}\n    };\n    return window.BraveBossAddon.render(sq,React,changeOrder,nextRound);\n  }\n  if (phase === \"bossBattle\" && bossBattle) {"]];
+    const bossPatches=[["  const startBoss = (bossData, allies) => {","  const startBoss = (bossData, allies) => {\n    if(window.BraveBossAddon && window.BraveDungeonSquad){setBossBattle({bossData,squad:window.BraveBossAddon.start(bossData,allies,{...char,...effectiveStats(char,jm)},JOB_SKILLS)});setBossLog([\"⚔️ 部隊戦へ突入！\"]);setLoading(false);setPhase(\"squadBoss\");return;}"],["  if (phase === \"bossBattle\" && bossBattle) {","  if(phase===\"squadBoss\" && bossBattle && bossBattle.squad){\n    const sq=bossBattle.squad;\n    const changeOrder=o=>setBossBattle({...bossBattle,squad:window.BraveDungeonSquad.setOrder(sq,o)});\n    const nextRound=()=>{\n      if(sq.result)return;\n      const n=window.BraveDungeonSquad.advance(sq);\n      setBossBattle({...bossBattle,squad:n});setBossLog(n.log);\n      if(n.result===\"victory\"){\n        if(bossBattle.bossData.name===MID_BOSS.name){setMaxDays(150);setDay(101);setPhase(\"midBossVictory\");}\n        else{const c={...char,atk:char.atk+5,def:char.def+5,mag:char.mag+5,spd:char.spd+5,luc:char.luc+5};setChar(c);setPhase(\"trueEnding\");\n        saveHistory({soulId:genSoulId(),name:c.name,job:c.currentJob,level:c.level,atk:c.atk,def:c.def,mag:c.mag,spd:c.spd,luc:c.luc,ali:c.ali,cf:c.cf,ending:\"TRUE ENDING\",date:new Date().toLocaleDateString(\"ja-JP\"),trueMastered:c.trueMastered||[],inheritedSkills:c.inheritedSkills||{}}).then(()=>loadHistory().then(setHistory)).catch(()=>{});\n        clearCurrent().catch(()=>{});setCurrentSave(null);}\n      }else if(n.result===\"defeat\"){clearCurrent().catch(()=>{});setCurrentSave(null);setChar({...char,hp:0});setPhase(\"gameover\");}\n    };\n    return window.BraveBossAddon.render(sq,React,changeOrder,nextRound);\n  }\n  if (phase === \"bossBattle\" && bossBattle) {"]];
     for(const [from,to] of bossPatches){if(source.split(from).length!==2)throw new Error("Boss patch mismatch");source=source.replace(from,to);}
     const injectPoint="<script>\nfunction _slicedToArray";
-    const modTag="<script src=\"./dungeon/ogre-squad-v0.1.js?v=3\"></scr"+"ipt><script src=\"./dungeon/boss-squad-addon.js?v=3\"></scr"+"ipt>";
+    const modTag="<script src=\"./dungeon/ogre-squad-v0.1.js?v=4\"></scr"+"ipt><script src=\"./dungeon/boss-squad-addon.js?v=4\"></scr"+"ipt>";
     if(source.split(injectPoint).length!==2)throw new Error("Script patch mismatch");
     source=source.replace(injectPoint,modTag+injectPoint);
     // Adventure choice scope fix: afterChoice handlers need the updated character.
@@ -98,13 +98,55 @@
     for(const [before,after]of skillEffectsPatches){if(source.split(before).length!==2)throw Error("職業スキルの更新位置が一致しません");source=source.replace(before,after);}
     const jobSkillAnchor="<script>\nfunction _slicedToArray";
     if(source.split(jobSkillAnchor).length!==2)throw Error("職業スキルファイルの読み込み位置が不明です");
-    source=source.replace(jobSkillAnchor,'<script src="./combat/job-skills-v1.js?v=1"></scr'+'ipt>'+jobSkillAnchor);
+    source=source.replace(jobSkillAnchor,'<script src="./combat/job-skills-v1.js?v=2"></scr'+'ipt>'+jobSkillAnchor);
     const saveHookMarker="  // ── useMemo: 重い計算をメモ化";
     if(source.split(saveHookMarker).length!==2)throw Error("購入後の自動セーブ挿入位置が不明");
     source=source.replace(saveHookMarker,"  // Keep purchases, equipment, and skills persistent even during boss preparation.\n  React.useEffect(()=>{\n    if (!char || !jm || ![\"shop\",\"skills\",\"equipment\",\"skillEquip\"].includes(phase)) return;\n    const id=setTimeout(()=>doAutoSave(char,jm,day,maxDays,null),160);\n    return ()=>clearTimeout(id);\n  },[phase,char,jm,day,maxDays]);\n\n"+saveHookMarker);
+    // Shared interpreter for manual dungeon combat: continue through victory and retaliation checks.
+    const dungeonStart=source.indexOf('      // JOB_SKILLS実行');
+    const dungeonEnd=source.indexOf('      const sb = sk.battle || {};',dungeonStart);
+    if(dungeonStart<0||dungeonEnd<0)throw Error("Dungeon skill integration target missing");
+    source=source.slice(0,dungeonStart)+`      if (_isJobSk) {
+        const r=window.BraveJobSkill.execute(sk,{...c,hp:charHp,mp:charMp},enemy,window.BraveJobSkill.stats(c,es));
+        c=r.character;enemy=r.enemy;charHp=c.hp;charMp=c.mp;bl.push(...r.log);
+      } else {
+`+source.slice(dungeonEnd);
+    const itemAnchor='    } else if (actionType.startsWith("item:")) {';
+    const dungeonItem=source.indexOf(itemAnchor,dungeonStart);
+    if(dungeonItem<0)throw Error("Dungeon skill branch target missing");
+    source=source.slice(0,dungeonItem)+'      }\n'+source.slice(dungeonItem);
+    source=source.replace('const _mpCost = sk.mpCost || (JOB_SKILLS[skId] ? 10 : 0);','const _mpCost = _isJobSk ? window.BraveJobSkill.cost(sk) : (sk.mpCost||0);');
+    source=source.replace('const _sk = LEARNABLE_SKILLS[_skId];','const _sk = JOB_SKILLS[_skId] || LEARNABLE_SKILLS[_skId];');
+    source=source.replace('if(_sk.mpCost && c.mp < _sk.mpCost)','if(window.BraveJobSkill.cost(_sk) > c.mp)');
+    source=source.replace('if(_sk.mpCost) c.mp = Math.max(0, c.mp - _sk.mpCost);','c.mp = Math.max(0,c.mp-window.BraveJobSkill.cost(_sk));');
+    // Carry spent resources back to the hero, without persisting temporary combat fields.
+    source=source.replace('setBossBattle({...bossBattle,squad:n});setBossLog(n.log);','setBossBattle({...bossBattle,squad:n});setBossLog(n.log);const heroAfter=n.allies.find(u=>u.id==="player");if(heroAfter)setChar({...char,hp:heroAfter.hp,mp:heroAfter.mp,gold:heroAfter.gold});');
+    // Shared defensive lifecycle for manual dungeon retaliation.
+    source=source.replace('const eDmg = Math.max(1, enemy.atk - es.def + Math.floor(Math.random() * 6));',`const enemyStats=window.BraveJobSkill.stats(enemy);
+    const defense=window.BraveJobSkill.stats(c,es).def;
+    let eDmg=Math.max(1,enemyStats.atk-defense+Math.floor(Math.random()*6));
+    if(enemy._stunned>0){enemy._stunned--;eDmg=0;bl.push("💫 敵はスタン");}
+    const received=window.BraveJobSkill.receive({...c,hp:charHp},eDmg);
+    c=received.character;eDmg=received.damage;
+    if(enemy._curseTurns>0){enemy.currentHp=Math.max(0,enemy.currentHp-Math.round(enemy.hp*(enemy._cursePct||0)));}
+    enemy=window.BraveJobSkill.tick(enemy);c=window.BraveJobSkill.tick(c);`);
+    // Attack buffs must affect the next manual adventure action as well.
+    source=source.replace('const _jobResult = JOB_SKILLS[_skId] && window.BraveJobSkill ? window.BraveJobSkill.execute(_sk,c,en,es)', 'const _jobResult = JOB_SKILLS[_skId] && window.BraveJobSkill ? window.BraveJobSkill.execute(_sk,c,en,es)');
+    source=source.replace('const newHp=Math.max(0,charHp-finalDmg);',`const incoming=window.BraveJobSkill.receive({...c,hp:charHp,_evaBonus:0},finalDmg);
+      c=incoming.character;finalDmg=incoming.damage;
+      const newHp=c.hp;`);
+    source=source.replace('const es={atk:Math.min(9999,c.atk*(1+(ib.atkPct||0)/100)),mag:Math.min(9999,c.mag*(1+(ib.magPct||0)/100)),spd:c.spd};','const es=window.BraveJobSkill.stats(c,{atk:Math.min(9999,c.atk*(1+(ib.atkPct||0)/100)),mag:Math.min(9999,c.mag*(1+(ib.magPct||0)/100)),spd:c.spd});');
+    source=source.replace('      // Check win',`      if(en._curseTurns>0){const curseDamage=Math.round(en.hp*(en._cursePct||0));en.currentHp=Math.max(0,en.currentHp-curseDamage);bl.push("☠️ 呪い -"+curseDamage);en._curseTurns--;}
+      for(const k of ["atk","def","mag","spd"]){const timer="_"+k+"DebufTurns";if(en[timer]>0 && --en[timer]===0)en["_"+k+"Debuf"]=0;}
+      // Check win`);
+    source=source.replace('else{const c={...char,atk:char.atk+5','else{const c={...char,hp:heroAfter?heroAfter.hp:char.hp,mp:heroAfter?heroAfter.mp:char.mp,gold:heroAfter?heroAfter.gold:char.gold,atk:char.atk+5');
     const equipmentLootPatches=[["  if (phase === \"equipment\") {","  if (phase === \"equipment\" && window.BraveEquipmentUI) {\n    return window.BraveEquipmentUI.render({\n      char,jobName:(JOBS[char.currentJob]||{}).name||char.currentJob,\n      weapons:WEAPONS,jobTypes:JOB_WEAPONS[char.currentJob]||[],\n      canEquip:id=>canEquip(char.currentJob,id),\n      onEquip:id=>setChar(c=>({...c,weapon:id})),\n      onBack:()=>setPhase(day>=maxDays?(maxDays<=100?\"midBossPrep\":\"finalBossPrep\"):(prevPhase||\"main\"))\n    });\n  }\n  if (phase === \"equipment\") {",1],["const price = Math.round((w.atk + w.mag * 1.5 + w.luc * 2) * 80 + 200);","const price = Math.round(((Number(w.atk)||0) + (Number(w.mag)||0)*1.5 + (Number(w.luc)||0)*2) * 80 + 200);",1],["w.luc !== 0 && \"LUC\"","(Number(w.luc)||0) !== 0 && \"LUC\"",1],["wData.luc !== 0 && /*#__PURE__*/React.createElement(\"span\",","(Number(wData.luc)||0) !== 0 && /*#__PURE__*/React.createElement(\"span\",",1],["      // Loot check\n      const dropRate = enemy.treasure + (es.luc || 10) * 0.003;\n      if (Math.random() < dropRate) {\n        const wKeys = Object.keys(WEAPONS).filter(k => canEquip(c.currentJob, k) && WEAPONS[k].rare < 0.35);\n        if (wKeys.length) {\n          const found = wKeys[Math.floor(Math.random() * wKeys.length)];\n          const wData = WEAPONS[found];\n          const cur = c.weapon ? WEAPONS[c.weapon] : null;\n          if (!cur || cur.atk + cur.mag < wData.atk + wData.mag) {\n            c = {\n              ...c,\n              weapon: found\n            };\n            bl.push(`💎 ${wData.emoji}${wData.name}ドロップ！`);\n          }\n        }\n      }\n","      // Loot v2: weapon and consumable drops. Preserve existing equipment and store items in inventory.\n      const baseDrop = Number.isFinite(Number(enemy.treasure)) ? Number(enemy.treasure) : 0.32;\n      const dropRate = Math.min(0.78,Math.max(0.42,baseDrop)+(es.luc||10)*0.002);\n      if(Math.random()<dropRate){\n        const eligible=Object.keys(WEAPONS).filter(k=>canEquip(c.currentJob,k) &&\n          (Number(WEAPONS[k].tier)||1)<=JOBS[c.currentJob].tier+1);\n        const weaponDrop=eligible.length>0 && Math.random()<0.62;\n        if(weaponDrop){\n          const found=eligible[Math.floor(Math.random()*eligible.length)];\n          const item=WEAPONS[found];\n          c={...c,inventory:[...(c.inventory||[]),found]};\n          bl.push(\"💎 \"+item.emoji+item.name+\" を入手！（装備画面から装備可能）\");\n        }else{\n          const list=[\"herb\",\"ether\",\"hi_herb\"].filter(k=>SHOP_ITEMS[k]);\n          if(list.length){\n            const found=list[Math.floor(Math.random()*list.length)];\n            c={...c,items:{...(c.items||{}),[found]:((c.items||{})[found]||0)+1}};\n            bl.push(\"🎁 \"+SHOP_ITEMS[found].name+\" を入手！\");\n          }\n        }\n      }\n",1]];
     for(const [from,to,count] of equipmentLootPatches){
-      if(source.split(from).length-1!==count)throw Error("Equipment/loot patch mismatch");
+      if(source.split(from).length-1!==count){
+        if(from.startsWith("const price =") && source.includes("const price = Math.round(((w.atk||0)"))continue;
+        if(from==='w.luc !== 0 && "LUC"' && !source.includes(from))continue;
+        throw Error("Equipment/loot patch mismatch");
+      }
       source=source.split(from).join(to);
     }
     source=source.replace("</head>",'<link rel="stylesheet" href="./ui/equipment-tactical-v1.css?v=1"></head>');
