@@ -1,14 +1,14 @@
 /* BRAVE SOUL squad-boss adapter. Uses the same AI round engine as dungeons. */
 (function(root){
 "use strict";
-function start(boss,allies,hero){
+function start(boss,allies,hero,skillBook={}){
  const companions=(allies||[]).slice(0,3);
- const heroUnit={id:"player",name:hero.name||"主人公",emoji:"⚔️",job:hero.currentJob,slot:0,
+ const heroUnit={...hero,equippedSkills:hero.equippedSkills||[],skillBook,id:"player",name:hero.name||"主人公",emoji:"⚔️",job:hero.currentJob,slot:0,
  hp:hero.hp,maxHp:hero.maxHp,mp:hero.mp,maxMp:hero.maxMp,atk:hero.atk,def:hero.def,mag:hero.mag,spd:hero.spd,role:"attacker"};
- const friends=companions.map((a,i)=>({id:a.soulId||"soul"+i,name:a.name,emoji:a.emoji||"✨",job:a.currentJob||a.job,
+ const friends=companions.map((a,i)=>({...a,equippedSkills:a.equippedSkills||[],skillBook,id:a.soulId||"soul"+i,name:a.name,emoji:a.emoji||"✨",job:a.currentJob||a.job,
  slot:[3,6,4][i],maxHp:a.maxHp||100+(a.level||1)*18,mp:a.maxMp||40,maxMp:a.maxMp||40,
  atk:a.atk||30,def:a.def||20,mag:a.mag||10,spd:a.spd||10,role:(a.mag||0)>(a.atk||0)?"healer":"attacker"}));
- const enemies=[{...boss,id:"boss",slot:0,maxHp:boss.hp,role:"attacker"}]
+ const enemies=[{...boss,isBoss:true,id:"boss",slot:0,maxHp:boss.hp,role:"attacker"}]
    .concat((boss.mobs||[]).slice(0,5).map((m,i)=>({...m,id:"mob"+i,slot:[3,6,1,4,7][i],maxHp:m.hp,role:"attacker"})));
  return root.BraveDungeonSquad.start({allies:[heroUnit,...friends],enemies,order:"balanced"});
 }
