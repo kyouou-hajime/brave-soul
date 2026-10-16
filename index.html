@@ -111,6 +111,8 @@
     const uiScriptPoint="<script>\\nfunction _slicedToArray".replace(/\\n/g,"\n");
     if(source.split(uiScriptPoint).length!==2)throw Error("Equipment script anchor missing");
     source=source.replace(uiScriptPoint,'<script src="./ui/equipment-tactical-v1.js?v=1"></scr'+'ipt>'+uiScriptPoint);
+    const dungeonLootPatches=[["if (wKeys.length && Math.random() < 0.3) {","if (wKeys.length && Math.random() < 0.65) {",1],["      c.gold = (c.gold || 0) + enemy.reward;\n      setDungeonBattle(null);","      c.gold = (c.gold || 0) + enemy.reward;\n      // Dungeon victories now award useful consumables. Boss victories guarantee one.\n      if(isBoss || Math.random()<0.52){\n        const dropPool=isBoss?[\"hi_herb\",\"ether\",\"elixir\"]:[\"herb\",\"ether\",\"hi_herb\"];\n        const itemId=dropPool[Math.floor(Math.random()*dropPool.length)];\n        if(SHOP_ITEMS[itemId]){\n          c.items={...(c.items||{}),[itemId]:((c.items||{})[itemId]||0)+1};\n          bl.push(\"🎁 \"+SHOP_ITEMS[itemId].name+\" をドロップ！\");\n        }\n      }\n      setDungeonBattle(null);",1]];
+    for(const [from,to,n] of dungeonLootPatches){if(source.split(from).length-1!==n)throw Error("Dungeon loot patch mismatch");source=source.split(from).join(to);}
     document.open();
     document.write(source);
     document.close();
