@@ -2,9 +2,9 @@
 // Run: node --test tests/true-master.test.cjs
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const path = require('node:path');
-const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+const {loadGame}=require('./helpers/load-game.cjs');
+let html;
+test.before(async()=>{html=await loadGame()});
 
 function getTrueConditions() {
   const m = html.match(/const TRUE_COND\s*=\s*(\{[\s\S]*?\});\s*\/\/ ── パワプロ式/);
