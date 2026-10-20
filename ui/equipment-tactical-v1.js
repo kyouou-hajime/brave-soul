@@ -6,6 +6,8 @@ function Equipment(props){
  const {char,jobName,weapons,canEquip,onEquip,onBack,jobTypes,stats,previewStats}=props;
  const [tab,setTab]=root.React.useState("usable");
  const held=new Set([...(char.inventory||[]),...(char.weapon?[char.weapon]:[])]);
+ const counts={};for(const id of char.inventory||[])counts[id]=(counts[id]||0)+1;
+ if(char.weapon&&!counts[char.weapon])counts[char.weapon]=1;
  const entries=Object.entries(weapons).filter(([id])=>held.has(id));
  const filtered=entries.filter(([id])=>tab==="all"||canEquip(id));
  const shown=stats||char;
@@ -55,7 +57,7 @@ function Equipment(props){
         onClick:()=>onEquip(isEquipped?null:id)},
         h("div",{className:"bs-equip-item-icon"},w.emoji||"⚔️"),
         h("div",{className:"bs-equip-item-info"},
-         h("strong",null,w.name),
+         h("strong",null,w.name+((counts[id]||0)>1?" ×"+counts[id]:"")),
          h("small",null,w.desc||"武器"),
          h("div",{className:"bs-equip-comparison"},"実効値差 ATK "+delta("atk")+" / MAG "+delta("mag")+" / LUC "+delta("luc"))),
         h("span",{className:"bs-equip-item-status"},isEquipped?"装備中":use?"装備":"不可"));

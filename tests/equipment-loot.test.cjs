@@ -52,3 +52,10 @@ test('all existing job skill definitions still execute and normal UI skill path 
  h.set('phase','battle');h.set('battle',{enemy:{hp:999,currentHp:999,def:0,atk:1,name:'test',emoji:''},charHp:80,charMp:100});rng(h,[.5]);
  await button(h,h.render(),'パワースラッシュ').props.onClick();assert.ok(h.get('battle').enemy.currentHp<999);assert.equal(h.get('char').mp,94);
 });
+test('boss preparation shop purchase and return consume no days; insufficient gold cannot purchase',async()=>{
+ for(const day of [100,150]){const h=await setup();h.set('day',day);h.set('maxDays',day);h.set('phase',day===100?'midBossPrep':'finalBossPrep');h.set('char',{...h.get('char'),gold:100000});button(h,h.render(),'武器・道具購入').props.onClick();let tree=h.render();const buy=h.nodes(tree,n=>n.type==='button'&&/^\d+G$/.test(text(n))).at(-1);buy.props.onClick();h.render();h.flush();button(h,h.render(),'戻る').props.onClick();assert.equal(h.get('phase'),day===100?'midBossPrep':'finalBossPrep');assert.equal(h.get('day'),day);assert.equal(JSON.parse(h.storage.get('lgm_current')).day,day);}
+ const h=await setup();h.set('phase','shop');const b=h.nodes(h.render(),n=>n.type==='button'&&/^\d+G$/.test(text(n))).at(-1);assert.equal(b.props.disabled,true);const before=plain(h.get('char'));b.props.onClick();assert.deepEqual(plain(h.get('char')),before);
+});
+test('equipment and purchases preserve duplicate weapon drops',async()=>{
+ const h=await setup();const old=h.get('char').weapon;h.set('char',{...h.get('char'),inventory:[old,old],gold:100000});h.set('phase','equipment');h.render().props.onEquip(null);assert.equal(h.get('char').inventory.length,2);h.set('phase','shop');const b=h.nodes(h.render(),n=>n.type==='button'&&/^\d+G$/.test(text(n))).at(-1);b.props.onClick();assert.equal(h.get('char').inventory.filter(id=>id===old).length,2);
+});
