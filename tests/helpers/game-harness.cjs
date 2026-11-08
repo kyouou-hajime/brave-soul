@@ -12,7 +12,7 @@ async function harness(){
  document:{getElementById:()=>null,createElement:()=>({}),head:{appendChild(){}}},setTimeout:(f)=>{timers.push(f);return timers.length},clearTimeout(){},setInterval(){},clearInterval(){},navigator:{},
  btoa:s=>Buffer.from(s,'binary').toString('base64'),atob:s=>Buffer.from(s,'base64').toString('binary')});
  ctx.window=ctx;
- for(const name of ['dungeon/ogre-squad-v0.1.js','dungeon/boss-squad-addon.js','combat/job-skills-v1.js','ui/equipment-tactical-v1.js'])vm.runInContext(fs.readFileSync(root+'/'+name,'utf8'),ctx);
+ for(const name of ['dungeon/ogre-squad-v0.1.js','dungeon/boss-squad-addon.js','combat/job-skills-v1.js','ui/equipment-tactical-v1.js','world/chronicle-v1.js'])vm.runInContext(fs.readFileSync(root+'/'+name,'utf8'),ctx);
  let script=[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].map(m=>m[1]).find(s=>s.includes('function App()'));
  // Capture closure functions only in test execution, never in the distributed game.
  script=script.replace('  // ── INTRO','  window.early={doBattle,startBoss,doLoad,doAutoSave};\n  // ── INTRO');

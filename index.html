@@ -119,6 +119,16 @@
       if(source.split(from).length!==2)throw Error("Verified equipment patch target mismatch: "+from.slice(0,80));
       source=source.replace(from,to);
     }
+    // Seven Seals campaign: additive save field and isolated React screen.
+    const chroniclePatches = [
+      ['  const slim = {', '  const slim = {\n    chronicle: char.chronicle || {version:1,cleared:[],claimed:[],active:null},'],
+      ['  // ── INTRO ────────────────────────────────────────────────────────────', '  if ((phase === "worldChronicle" || (phase === "main" && char && char.chronicle && char.chronicle.active)) && char && window.BraveChronicle) {\n    const souls=(char.soulSlots||[]).filter(s=>s.unlocked&&s.soulId).map(s=>(history||[]).concat(STARTER_SOULS).find(h=>h.soulId===s.soulId)).filter(Boolean).slice(0,3);\n    return React.createElement(window.BraveChronicle.Screen,{char,day,maxDays,stats:effectiveStats(char,jm),souls,onChange:nc=>{setChar(nc);doAutoSave(nc,jm,day,maxDays,null);},onBack:()=>setPhase("main")});\n  }\n  // ── INTRO ────────────────────────────────────────────────────────────'],
+      ['      // キャラ情報', '      React.createElement("button",{onClick:()=>setPhase("worldChronicle"),style:{...BTN("#d8bc81"),width:"100%",minHeight:76,marginBottom:12,padding:"14px 18px",background:"linear-gradient(120deg,#263e41,#1c2337)",border:"1px solid #ad986b",fontSize:18,textAlign:"left"}},React.createElement("div",{style:{fontSize:11,letterSpacing:3,color:"#cbb789",marginBottom:5}},"SEVEN SEALS · 大陸遠征"),char.chronicle&&char.chronicle.active?"⚔ 遠征中の戦闘を再開する →":"🧭 七つの封印を解き放つ →",React.createElement("div",{style:{fontSize:13,color:"#b0c3ca",marginTop:5}},"7地域・21拠点 / 解放 "+((char.chronicle||{}).cleared||[]).length+" / 21")),\n      // キャラ情報']
+    ];
+    for(const [from,to] of chroniclePatches){if(source.split(from).length!==2)throw Error("Chronicle integration target mismatch: "+from.slice(0,70)+" / "+(source.split(from).length-1));source=source.replace(from,to);}
+    const chronicleAnchor="<script>\nfunction _slicedToArray";
+    if(source.split(chronicleAnchor).length!==2)throw Error("Chronicle script anchor missing");
+    source=source.replace(chronicleAnchor,'<script src="./world/chronicle-v1.js?v=1"></scr'+'ipt>'+chronicleAnchor);
     document.open();
     document.write(source);
     document.close();
